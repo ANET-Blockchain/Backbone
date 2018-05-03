@@ -32,7 +32,7 @@ func (cli *CLI) Run() {
 	cli.ValidateArgs()
 
 	nodeID := os.Getenv("NODE_ID")
-	nodeID = "3001"
+
 	if nodeID == "" {
 		fmt.Println("NODE_ID env. var is not set!")
 		os.Exit(1)
