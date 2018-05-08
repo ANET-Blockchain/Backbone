@@ -14,6 +14,7 @@ func (cli *CLI) PrintUsage() {
 	fmt.Println("  CreateBlockchain -address [ADDRESS] : Create a blockchain and send genesisblock reward to ADDRESS")
 	fmt.Println("  CreateWallet : Generates a new key-pair and saves it into the wallet file")
 	fmt.Println("  GetBalance -address [ADDRESS] : GET balance of ADDRESS")
+	fmt.Println("  GetAllBalances : print the balances of all addresses")
 	fmt.Println("  ListAddresses : Lists all addresses from the wallet file")
 	fmt.Println("  PrintChain : print all the blocks of the blockchain")
 	fmt.Println("  Send -from [FROM ADDRESS] -to [TO ADDRESS] -amount [AMOUNT] : Send AMOUNT of coins from FROM to TO. Mine on the same node, when -mine is set.")
@@ -32,13 +33,13 @@ func (cli *CLI) Run() {
 	cli.ValidateArgs()
 
 	nodeID := os.Getenv("NODE_ID")
-
 	if nodeID == "" {
 		fmt.Println("NODE_ID env. var is not set!")
 		os.Exit(1)
 	}
 
 	getBalanceCmd := flag.NewFlagSet("GetBalance", flag.ExitOnError)
+	getAllBalancesCmd := flag.NewFlagSet("GetAllBalances", flag.ExitOnError)
 	createBlockchainCmd := flag.NewFlagSet("CreateBlockchain", flag.ExitOnError)
 	createWalletCmd := flag.NewFlagSet("CreateWallet", flag.ExitOnError)
 	listAddressesCmd := flag.NewFlagSet("ListAddresses", flag.ExitOnError)
@@ -58,6 +59,11 @@ func (cli *CLI) Run() {
 	switch os.Args[1] {
 	case "GetBalance":
 		err := getBalanceCmd.Parse(os.Args[2:])
+		if err != nil {
+			log.Panic(err)
+		}
+	case "GetAllBalances":
+		err := getAllBalancesCmd.Parse(os.Args[2:])
 		if err != nil {
 			log.Panic(err)
 		}
@@ -107,6 +113,10 @@ func (cli *CLI) Run() {
 			os.Exit(1)
 		}
 		cli.GetBalance(*getBalanceAddress, nodeID)
+	}
+
+	if getAllBalancesCmd.Parsed() {
+		cli.GetAllBalances(nodeID)
 	}
 
 	if createBlockchainCmd.Parsed() {
