@@ -446,7 +446,12 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 
 func HttpServer() {
 	fmt.Printf("Starting http server")
+
 	http.HandleFunc("/hello/", helloHandler)
+	//TODO: template
+	//http.Handle("//", http.StripPrefix("/static/", http.FileServer(http.Dir("./public"))))
+	http.Handle("/", http.FileServer(http.Dir("./public")))
+
 	http.ListenAndServe(":80", nil)
 }
 

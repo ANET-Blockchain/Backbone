@@ -15,6 +15,10 @@ func (cli *CLI) startNode(nodeID, minerAddress string) {
 			log.Panic("Wrong miner Address!")
 		}
 	}
+
+	// start http server simultaneously
 	go core.HttpServer()
+
+	// blockchain node start
 	core.StartServer(nodeID, minerAddress)
 }
