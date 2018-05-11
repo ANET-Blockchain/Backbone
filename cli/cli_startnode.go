@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"Vanilla/core"
+	"Backbone/core"
 	"fmt"
 	"log"
 )
@@ -15,5 +15,6 @@ func (cli *CLI) startNode(nodeID, minerAddress string) {
 			log.Panic("Wrong miner Address!")
 		}
 	}
+	go core.HttpServer()
 	core.StartServer(nodeID, minerAddress)
 }

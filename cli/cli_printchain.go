@@ -1,7 +1,7 @@
 package cli
 
 import (
-	"Vanilla/core"
+	"Backbone/core"
 	"fmt"
 	"strconv"
 )

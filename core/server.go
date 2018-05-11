@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"net/http"
 )
 
 const protocol = "tcp"
@@ -417,6 +418,7 @@ func StartServer(nodeID, minerAddress string) {
 	nodeAddress = fmt.Sprintf("localhost:%s", nodeID)
 	miningAddress = minerAddress
 	ln, err := net.Listen(protocol, nodeAddress)
+
 	if err != nil {
 		log.Panic(err)
 	}
@@ -435,6 +437,17 @@ func StartServer(nodeID, minerAddress string) {
 		}
 		go handleConnection(conn, bc)
 	}
+}
+
+func helloHandler(w http.ResponseWriter, r *http.Request) {
+	remPartOfURL := r.URL.Path[len("/hello/"):] //get everything after the /hello/ part of the URL
+	fmt.Fprintf(w, "Hello %s!", remPartOfURL)
+}
+
+func HttpServer() {
+	fmt.Printf("Starting http server")
+	http.HandleFunc("/hello/", helloHandler)
+	http.ListenAndServe(":80", nil)
 }
 
 func gobEncode(data interface{}) []byte {
