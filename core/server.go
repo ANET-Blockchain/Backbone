@@ -439,19 +439,9 @@ func StartServer(nodeID, minerAddress string) {
 	}
 }
 
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	remPartOfURL := r.URL.Path[len("/hello/"):] //get everything after the /hello/ part of the URL
-	fmt.Fprintf(w, "Hello %s!", remPartOfURL)
-}
-
-func HttpServer() {
+func HTTPServer() {
 	fmt.Printf("Starting http server")
-
-	http.HandleFunc("/hello/", helloHandler)
-	//TODO: template
-	//http.Handle("//", http.StripPrefix("/static/", http.FileServer(http.Dir("./public"))))
 	http.Handle("/", http.FileServer(http.Dir("./public")))
-
 	http.ListenAndServe(":80", nil)
 }
 

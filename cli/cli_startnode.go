@@ -17,7 +17,7 @@ func (cli *CLI) startNode(nodeID, minerAddress string) {
 	}
 
 	// start http server simultaneously
-	go core.HttpServer()
+	go core.HTTPServer()
 
 	// blockchain node start
 	core.StartServer(nodeID, minerAddress)
