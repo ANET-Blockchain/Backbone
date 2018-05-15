@@ -1,7 +1,7 @@
 package core
 
 import (
-	"Vanilla/utils"
+	"Backbone/utils"
 	"bytes"
 	"crypto/sha256"
 	"fmt"
