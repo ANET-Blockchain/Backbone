@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 
 	"github.com/boltdb/bolt"
 )
@@ -15,6 +16,11 @@ import (
 const dbFile = "blockchain_%s.db"
 const blocksBucket = "blocks"
 const genesisCoinbaseData = "GENESIS"
+
+const BlockGenerationInterval = 10
+const DifficultyAdjustmentInterval = 10
+
+var lastCalculatedBlockPreviousHash []byte = []byte{}
 
 //Blockchain struct
 type Blockchain struct {
@@ -54,7 +60,8 @@ func (bc *Blockchain) MineBlock(transactions []*Transaction) *Block {
 		log.Panic(err)
 	}
 
-	newBlock := NewBlock(transactions, lastHash, lastHeight+1)
+	newDifficulty := bc.findDifficulty()
+	newBlock := NewBlock(transactions, lastHash, lastHeight+1, newDifficulty)
 
 	err = bc.Db.Update(func(tx *bolt.Tx) error {
 		b := tx.Bucket([]byte(blocksBucket))
@@ -321,7 +328,7 @@ func (bc *Blockchain) AddBlock(block *Block) {
 	}
 }
 
-func (bc *Blockchain) GetBestHeight() int {
+func (bc *Blockchain) GetLastBlock() *Block {
 	var lastBlock Block
 
 	err := bc.Db.View(func(tx *bolt.Tx) error {
@@ -336,7 +343,50 @@ func (bc *Blockchain) GetBestHeight() int {
 		log.Panic(err)
 	}
 
-	return lastBlock.Height
+	return &lastBlock
+}
+
+func (bc *Blockchain) findDifficulty() int {
+
+	count := BlockGenerationInterval
+	bci := bc.Iterator()
+	curBlock := bci.Next()
+	lastBlock := curBlock
+	for count > 0 {
+		curBlock = bci.Next()
+
+		if len(curBlock.PrevBlockHash) == 0 || reflect.DeepEqual(lastCalculatedBlockPreviousHash, curBlock.PrevBlockHash) {
+			break
+		}
+		count--
+	}
+
+	if count == 0 {
+		// if BlockGenerationInterval has passed
+		if len(lastCalculatedBlockPreviousHash) == 0 || reflect.DeepEqual(lastCalculatedBlockPreviousHash, curBlock.PrevBlockHash) {
+			lastCalculatedBlockPreviousHash = curBlock.Hash
+			return bc.calculateNewDifficulty(lastBlock, curBlock)
+		}
+	}
+	// if there're less blocks than BlockGenerationInterval
+	return lastBlock.Difficulty
+}
+
+func (bc *Blockchain) calculateNewDifficulty(newestBlock *Block, lastCalculatedBlcok *Block) int {
+	var timeExpected int = BlockGenerationInterval * DifficultyAdjustmentInterval
+	var timeTaken int = int(newestBlock.Timestamp - lastCalculatedBlcok.Timestamp)
+
+	if timeTaken < timeExpected/2 {
+		return lastCalculatedBlcok.Difficulty + 1
+	} else if timeTaken > timeExpected*2 {
+		return lastCalculatedBlcok.Difficulty - 1
+	} else {
+		return lastCalculatedBlcok.Difficulty
+	}
+}
+
+func (bc *Blockchain) GetBestHeight() int {
+	return bc.GetLastBlock().Height
 }
 
 func (bc *Blockchain) GetBlock(blockHash []byte) (Block, error) {

@@ -9,7 +9,8 @@ import (
 	"math/big"
 )
 
-const targetBits = 8
+var targetBits = 8
+
 const maxNonce = math.MaxInt64
 
 type ProofOfWork struct {
@@ -17,9 +18,9 @@ type ProofOfWork struct {
 	target *big.Int
 }
 
-func NewProofOfWork(b *Block) *ProofOfWork {
+func NewProofOfWork(b *Block, difficulty int) *ProofOfWork {
 	target := big.NewInt(1)
-	target.Lsh(target, uint(256-targetBits))
+	target.Lsh(target, uint(256-difficulty))
 
 	pow := &ProofOfWork{b, target}
 
