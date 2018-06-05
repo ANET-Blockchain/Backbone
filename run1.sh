@@ -55,3 +55,21 @@ echo $ADDR > address_3002.txt
 echo $ADDR2 >> address_3002.txt
 echo $ADDR3 >> address_3002.txt
 echo $ADDR4 >> address_3002.txt
+
+export NODE_ID=3000
+
+read CENTRAL_NODE < address_3000.txt
+
+count=1
+while read line; do
+  export WALLET_$count=$line
+  count=$(($count + 1))
+done < address_3001.txt
+read MINER_NODE < address_3002.txt
+
+echo "./Backbone Send -from ${CENTRAL_NODE} -to ${WALLET_1} -amount 4 -mine"
+./Backbone Send -from $CENTRAL_NODE -to $WALLET_1 -amount 10 -mine
+echo "./Backbone Send -from ${CENTRAL_NODE} -to ${WALLET_2} -amount 4 -mine"
+./Backbone Send -from $CENTRAL_NODE -to $WALLET_2 -amount 10 -mine
+
+./Backbone StartNode
