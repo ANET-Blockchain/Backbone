@@ -352,12 +352,14 @@ func (bc *Blockchain) findDifficulty() int {
 	bci := bc.Iterator()
 	curBlock := bci.Next()
 	lastBlock := curBlock
+	//log.Println("curBlock")
 	for count > 0 {
-		curBlock = bci.Next()
-
 		if len(curBlock.PrevBlockHash) == 0 || reflect.DeepEqual(lastCalculatedBlockPreviousHash, curBlock.PrevBlockHash) {
 			break
 		}
+		curBlock = bci.Next()
+		//log.Println(curBlock)
+
 		count--
 	}
 
