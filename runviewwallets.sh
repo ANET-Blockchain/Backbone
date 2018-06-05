@@ -13,5 +13,8 @@ read MINER_NODE < address_3002.txt
 ./Backbone GetBalance -address $WALLET_3
 ./Backbone GetBalance -address $WALLET_4
 
+echo "MINER"
 ./Backbone GetBalance -address $MINER_NODE
+
+echo "CENTRAL"
 ./Backbone GetBalance -address $CENTRAL_NODE

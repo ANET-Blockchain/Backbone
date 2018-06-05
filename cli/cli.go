@@ -144,7 +144,6 @@ func (cli *CLI) Run() {
 			sendCmd.Usage()
 			os.Exit(1)
 		}
-
 		cli.Send(*sendFrom, *sendTo, *sendAmount, nodeID, *sendMine)
 	}
 
